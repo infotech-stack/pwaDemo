@@ -1,34 +1,36 @@
-# This is ".github/workflows/gh-pages.yml" file.
-# This is an EXAMPLE of "GitHub Actions Workflow file".
-
-name: github pages
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches:
-      - master
+      - main  # Trigger on push to the main branch
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    steps:
-      # Checkout the code
-      - uses: actions/checkout@v4
 
-      # Install .NET Core SDK
-      - name: Setup .NET Core
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        
+      - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: '8.0.x'  # Ensure this matches your .NET SDK version (8.0.6)
 
-      # Publish the site
-      - name: Publish
-        run: dotnet publish pwaDemo.sln -c:Release -o:publish -p:GHPages=true
+      - name: Build and publish
+        run: |
+          dotnet publish -c Release -o build
 
-      # Deploy the site
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Modify base URL in index.html
+        run: |
+          sed -i 's|<base href="/">|<base href="/pwaDemo/">|g' build/wwwroot/index.html
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
-          github_token: ${{SAMPLE}}
-          publish_dir: publish/wwwroot
-          force_orphan: true
+          GITHUB_TOKEN: ${{ secrets.SAMPLE }}
+          BRANCH: master
+          FOLDER: build/wwwroot
+          CLEAN: true  # Optional: Ensures the target folder is cleaned before deploying
+
