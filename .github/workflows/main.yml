@@ -30,7 +30,7 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
           GITHUB_TOKEN: ${{ secrets.SAMPLE }}
-          BRANCH: master
+          BRANCH: gh-pages
           FOLDER: build/wwwroot
           CLEAN: true  # Optional: Ensures the target folder is cleaned before deploying
 
